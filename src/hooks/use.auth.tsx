@@ -18,14 +18,13 @@ export function useAuth() {
     passwordToConfirm,
     setPasswordToConfirm,
   } = authContext;
-  //   Funcion para verificar autenticación
+
   const isAuth = () => {
     return isAuthenticated;
   };
 
-  const loginState = (email: string) => {
+  const loginState = () => {
     setIsAuthenticated(true);
-    setNewEmailConfirm(email); // Establecer el email confirmado
   };
 
   const logoutState = () => {
@@ -35,6 +34,7 @@ export function useAuth() {
   const getNewEmailConfirm = () => {
     return emailConfirm;
   };
+
   const setNewEmailConfirm = (input: string) => {
     setEmailConfirm(input);
   };
@@ -49,15 +49,15 @@ export function useAuth() {
     password: string;
     email: string;
     verified: boolean;
-    _id: "";
+    _id: string;
   }) => {
     setUserInfo({
-      name: data?.name,
-      username: data?.username,
-      password: data?.password,
-      email: data?.email,
-      verified: data?.verified,
-      _id: data?._id,
+      name: data.name,
+      username: data.username,
+      password: data.password,
+      email: data.email,
+      verified: data.verified,
+      _id: data._id,
     });
   };
 
@@ -68,8 +68,8 @@ export function useAuth() {
   const updatePasswordToConfirm = (input: string) => {
     setPasswordToConfirm(input);
   };
+
   const [codeToConfirm, setCodeToConfirm] = useState("");
-  console.log(codeToConfirm);
   const updateCodeToConfirm = (code: string) => {
     setCodeToConfirm(code);
   };

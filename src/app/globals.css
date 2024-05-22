@@ -8,3 +8,9 @@
   align-items: center;
   flex-direction: column;
 }
+.glassEffect {
+  background: #5e5e5e36;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  -webkit-backdrop-filter: blur(3.8px);
+  backdrop-filter: blur(3.8px);
+}

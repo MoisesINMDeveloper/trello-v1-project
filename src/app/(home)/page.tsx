@@ -2,38 +2,57 @@
 import WelcomeTemplate from "@/templates/WelcomeTemplate/WelcomeTemplate";
 import { useAuth } from "@/hooks/use.auth";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import WelcomeLoad from "@/components/organism/WelcomeLoad/WelcomeLoad";
+import NavigationBar from "@/components/organism/NavigationBar/NavigationBar";
 
 export default function Home() {
-  // Hooks
   const { isAuth, getUserInfo, loginState, updateUserInfo } = useAuth();
-  const { username } = getUserInfo();
+  const [loading, setLoading] = useState(true);
+  const [username, setUsername] = useState("");
   const router = useRouter();
-
   const params = useSearchParams();
+
   useEffect(() => {
     const tokenQuery = params.get("token");
     const decodedTokenQuery = tokenQuery
       ? decodeURIComponent(tokenQuery)
       : null;
-    const userQuery = params.get("user");
+    const userQuery = params.get("username");
     const decodedUserQuery = userQuery
       ? JSON.parse(decodeURIComponent(userQuery))
       : null;
 
     if (decodedTokenQuery && decodedUserQuery) {
       localStorage.setItem("token", decodedTokenQuery);
+      loginState();
       updateUserInfo(decodedUserQuery);
+      setUsername(decodedUserQuery.username);
       router.replace("/");
+    } else {
+      const userInfo = getUserInfo();
+      setUsername(userInfo.username || "user");
+      setLoading(false); // Mover aquí para asegurar que la carga solo se termina una vez obtenida la información
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [params, loginState, updateUserInfo, getUserInfo, router]);
+
+  if (loading) {
+    return <WelcomeLoad />;
+  }
 
   return (
-    <>
-      <WelcomeLoad />
-      {isAuth() ? <main>Dashboard {username}</main> : <WelcomeTemplate />}
-    </>
+    <main className="h-screen w-screen">
+      {isAuth() ? (
+        <>
+          {" "}
+          <NavigationBar />
+          Dashboard {username}
+        </>
+      ) : (
+        <>
+          <WelcomeTemplate />
+        </>
+      )}
+    </main>
   );
 }

@@ -12,7 +12,6 @@ import {
 import { useAuth } from "@/hooks/use.auth";
 import VerificationErrorModal from "@/components/modals/verify/VerificationErrorModal";
 import VerificationSuccessModal from "@/components/modals/verify/VerificationSuccessmodal";
-
 import { CircularProgress } from "@nextui-org/react";
 import { ToastContainer, toast } from "react-toastify";
 
@@ -29,14 +28,18 @@ const VerifyForm: React.FC<VerifyFormType> = ({ from, email }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [resendButtonLoader, setResendButtonLoader] = useState<boolean>(false);
   const router = useRouter();
-  const { getNewEmailConfirm, updateUserInfo, getPasswordToConfirm } =
-    useAuth();
-  console.log(getNewEmailConfirm());
+  const {
+    getNewEmailConfirm,
+    updateUserInfo,
+    getPasswordToConfirm,
+    loginState,
+  } = useAuth();
+
   useEffect(() => {
     if (from === "register" && getNewEmailConfirm()) {
       setShowResendLink(true);
     }
-  }, []);
+  }, [from, getNewEmailConfirm]);
 
   const handleResendCode = () => {
     setResendButtonLoader(true);
@@ -83,13 +86,13 @@ const VerifyForm: React.FC<VerifyFormType> = ({ from, email }) => {
       email: getNewEmailConfirm(),
       verificationCode: VerifyInput,
     };
-    console.log(formData);
     axios
       .post(`${process.env.API_URL}${AUTH_VERIFY}`, formData)
       .then(async (res) => {
         const data = res.data;
         localStorage.setItem("token", data?.token);
         updateUserInfo(data?.user);
+        loginState();
         setVerificationSuccess(true);
         setTimeout(() => {
           router.push("/");

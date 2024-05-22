@@ -1,14 +1,15 @@
 import React, { useState } from "react";
 import Button from "../atoms/button";
-import { useRouter } from "next/navigation"; // Importa useRouter desde next/router en lugar de next/navigation
+import { useRouter } from "next/navigation"; // Importa useRouter desde next/router
 import InputForm from "../atoms/input";
 import axios from "axios";
 import { AUTH_LOGIN } from "@/constant/apiKeys";
 import { useAuth } from "../../hooks/use.auth";
 import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const SigninForm = () => {
-  const { setNewEmailConfirm, getNewEmailConfirm } = useAuth();
+  const { setNewEmailConfirm, updateUserInfo, loginState } = useAuth();
   const router = useRouter();
 
   const [formData, setFormData] = useState({
@@ -20,7 +21,6 @@ const SigninForm = () => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
-  console.log(formData);
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
@@ -29,18 +29,20 @@ const SigninForm = () => {
         `${process.env.API_URL}${AUTH_LOGIN}`,
         formData
       );
-      if (formData.email) {
-        setNewEmailConfirm(formData.email); // Establecer el nuevo correo electrónico confirmado
-        router.push(`/dashboard`); // Si el correo está verificado, redirigir al usuario al dashboard
+
+      if (response.status === 200) {
+        const { token, name } = response.data;
+        localStorage.setItem("token", token);
+        updateUserInfo(name);
+        loginState();
+        router.push(`/`); // Redirigir al dashboard si el inicio de sesión es exitoso
+      } else if (response.status === 403) {
+        setNewEmailConfirm(formData.email);
+        router.push(`/login/verify`); // Redirigir a verificación si es necesario
       }
     } catch (error: any) {
       console.error("Error al enviar la solicitud:", error);
-      if (error.response?.status === 403) {
-        setNewEmailConfirm(formData.email);
-        router.push(`/login/verify`);
-      } else {
-        notifyError("Ha ocurrido un error, por favor inténtalo nuevamente.");
-      }
+      notifyError("Ha ocurrido un error, por favor inténtalo nuevamente.");
     }
   };
 
@@ -57,25 +59,25 @@ const SigninForm = () => {
         onSubmit={handleSubmit}
       >
         <ToastContainer draggable />
-        <div className="flexcol justify-between gap-4 mb-[16rem]">
+        <div className="flex flex-col justify-between gap-4 mb-[16rem]">
           <InputForm
-            type={"email"}
-            name={"email"}
-            placeholder={"Email"}
+            type="email"
+            name="email"
+            placeholder="Email"
             value={formData.email}
             onChange={handleChange}
           />
           <InputForm
-            type={"password"}
-            name={"password"}
-            placeholder={"Password"}
+            type="password"
+            name="password"
+            placeholder="Password"
             value={formData.password}
             onChange={handleChange}
           />
         </div>
 
         <div>
-          <Button text={"Ingresar"} type={"submit"} />
+          <Button text="Ingresar" type="submit" />
         </div>
       </form>
     </section>
