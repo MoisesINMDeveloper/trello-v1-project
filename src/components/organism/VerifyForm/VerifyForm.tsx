@@ -80,32 +80,42 @@ const VerifyForm: React.FC<VerifyFormType> = ({ from, email }) => {
     }
   };
 
-  const handleSubmit = (VerifyInput: string) => {
+  const handleSubmit = async (VerifyInput: string) => {
     setLoading(true);
-    const formData = {
-      email: getNewEmailConfirm(),
-      verificationCode: VerifyInput,
-    };
-    axios
-      .post(`${process.env.API_URL}${AUTH_VERIFY}`, formData)
-      .then(async (res) => {
-        const data = res.data;
-        localStorage.setItem("token", data?.token);
-        updateUserInfo(data?.user);
-        loginState();
-        setVerificationSuccess(true);
-        setTimeout(() => {
-          router.push("/");
-        }, 3500);
-      })
-      .catch(() => {
-        setVerificationError(true);
-        setTimeout(() => {
-          setVerificationError(false);
-        }, 3000);
-        setVerificationInput("");
-        setLoading(false);
-      });
+    console.log("handleSubmit");
+    try {
+      if (from === "register" || from === "login") {
+        const formData = {
+          email: getNewEmailConfirm(),
+          verificationCode: VerifyInput,
+        };
+        const response = await axios.post(
+          `${process.env.API_URL}${AUTH_VERIFY}`,
+          formData
+        );
+
+        if (response.status === 200) {
+          const data = response.data;
+          updateUserInfo(data?.user);
+          localStorage.setItem("token", data?.user?.token);
+          loginState();
+          setVerificationSuccess(true);
+          console.log("timeout");
+          setTimeout(() => {
+            router.push("/");
+          }, 3500);
+          console.log(data);
+        }
+      }
+    } catch (error) {
+      setVerificationError(true);
+      setTimeout(() => {
+        setVerificationError(false);
+      }, 3000);
+      setVerificationInput("");
+      setLoading(false);
+      console.log(error);
+    }
   };
 
   const notifyError = (errorMessage: string) =>

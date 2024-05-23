@@ -11,7 +11,7 @@ const Button = ({
 }) => {
   return (
     <button
-      className={`bg-black text-3xl font-semibold text-white w-[80vw] h-14 rounded-full ${className}`}
+      className={`bg-black text-3xl font-semibold text-white w-[80vw] h-14 rounded-2xl ${className}`}
       type={type}
     >
       {text}

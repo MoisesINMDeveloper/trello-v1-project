@@ -29,20 +29,21 @@ const SigninForm = () => {
         `${process.env.API_URL}${AUTH_LOGIN}`,
         formData
       );
-
       if (response.status === 200) {
         const { token, name } = response.data;
         localStorage.setItem("token", token);
         updateUserInfo(name);
         loginState();
         router.push(`/`); // Redirigir al dashboard si el inicio de sesión es exitoso
-      } else if (response.status === 403) {
-        setNewEmailConfirm(formData.email);
-        router.push(`/login/verify`); // Redirigir a verificación si es necesario
       }
     } catch (error: any) {
-      console.error("Error al enviar la solicitud:", error);
-      notifyError("Ha ocurrido un error, por favor inténtalo nuevamente.");
+      if (error.response && error.response.status === 403) {
+        setNewEmailConfirm(formData.email);
+        router.push(`/login/verify`); // Redirigir a verificación si es necesario
+      } else {
+        console.error("Error al enviar la solicitud:", error);
+        notifyError("Ha ocurrido un error, por favor inténtalo nuevamente.");
+      }
     }
   };
 

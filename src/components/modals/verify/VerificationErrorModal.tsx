@@ -17,9 +17,9 @@ const VerificationErrorModal: React.FC<VerificationErrorModalInterface> = ({
   }, [modal]);
 
   return (
-    <main className="w-screen flex flex-col items-center h-screen justify-around py-[60px] fixed top-0 right-0 z-[100] bg-white-100 px-[30px]">
+    <main className="w-screen  flex flex-col items-center h-screen justify-around py-[60px] fixed top-0 right-0 z-[100] bg-white px-[30px]">
       <div className="flex flex-col items-center gap-4 ">
-        <h3 className="text-error text-[36px] font-bold text-center">
+        <h3 className="text-error text-[36px] font-bold text-center text-red-500">
           Verificación fallida
         </h3>
       </div>

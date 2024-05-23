@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import WelcomeLoad from "@/components/organism/WelcomeLoad/WelcomeLoad";
 import NavigationBar from "@/components/organism/NavigationBar/NavigationBar";
-
+// CREAR UN HOOKS SI NO CONSIGO COMO VALIDAR LA AUTENTICACION DEL USUARIO
 export default function Home() {
   const { isAuth, getUserInfo, loginState, updateUserInfo } = useAuth();
   const [loading, setLoading] = useState(true);
