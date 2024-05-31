@@ -17,17 +17,16 @@ export function useAuth() {
     setUserInfo,
     passwordToConfirm,
     setPasswordToConfirm,
+    loginState,
+    getToken,
   } = authContext;
 
   const isAuth = () => {
     return isAuthenticated;
   };
 
-  const loginState = () => {
-    setIsAuthenticated(true);
-  };
-
   const logoutState = () => {
+    localStorage.removeItem("token");
     setIsAuthenticated(false);
   };
 
@@ -91,5 +90,6 @@ export function useAuth() {
     codeToConfirm,
     getConfirmedEmail,
     updateCodeToConfirm,
+    getToken,
   };
 }

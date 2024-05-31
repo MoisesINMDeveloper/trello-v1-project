@@ -4,7 +4,6 @@ import VerifyInput from "@/components/atoms/VerifyInput";
 import Button from "@/components/atoms/button";
 import axios from "axios";
 import {
-  AUTH_FORGOT_PASSWORD,
   AUTH_VERIFY,
   RESEND_CODE_LOGIN,
   RESEND_CODE_REGISTER,
@@ -48,8 +47,6 @@ const VerifyForm: React.FC<VerifyFormType> = ({ from, email }) => {
       apiKeyToUse = RESEND_CODE_LOGIN;
     } else if (from === "register") {
       apiKeyToUse = RESEND_CODE_REGISTER;
-    } else if (from === "recover-account") {
-      apiKeyToUse = AUTH_FORGOT_PASSWORD;
     }
     axios
       .post(`${process.env.API_URL}${apiKeyToUse}${email}`)
@@ -97,14 +94,11 @@ const VerifyForm: React.FC<VerifyFormType> = ({ from, email }) => {
         if (response.status === 200) {
           const data = response.data;
           updateUserInfo(data?.user);
-          localStorage.setItem("token", data?.user?.token);
-          loginState();
+          loginState(data?.user?.token);
           setVerificationSuccess(true);
-          console.log("timeout");
           setTimeout(() => {
             router.push("/");
           }, 3500);
-          console.log(data);
         }
       }
     } catch (error) {

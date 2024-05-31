@@ -33,7 +33,7 @@ const SigninForm = () => {
         const { token, name } = response.data;
         localStorage.setItem("token", token);
         updateUserInfo(name);
-        loginState();
+        loginState(token);
         router.push(`/`); // Redirigir al dashboard si el inicio de sesión es exitoso
       }
     } catch (error: any) {

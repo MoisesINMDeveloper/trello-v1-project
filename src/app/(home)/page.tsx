@@ -5,13 +5,22 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import WelcomeLoad from "@/components/organism/WelcomeLoad/WelcomeLoad";
 import NavigationBar from "@/components/organism/NavigationBar/NavigationBar";
-// CREAR UN HOOKS SI NO CONSIGO COMO VALIDAR LA AUTENTICACION DEL USUARIO
+import useUserData from "@/hooks/use.userdata";
+import HomeTemplate from "@/templates/homeTemplate/home.template";
+import { UserError } from "../../../types";
+
 export default function Home() {
-  const { isAuth, getUserInfo, loginState, updateUserInfo } = useAuth();
-  const [loading, setLoading] = useState(true);
-  const [username, setUsername] = useState("");
+  const { isAuth, loginState, updateUserInfo } = useAuth();
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [username, setUsername] = useState<string>("");
   const router = useRouter();
   const params = useSearchParams();
+  const {
+    userData,
+    loading: userDataLoading,
+    error,
+    fetchUserData,
+  } = useUserData();
 
   useEffect(() => {
     const tokenQuery = params.get("token");
@@ -25,33 +34,43 @@ export default function Home() {
 
     if (decodedTokenQuery && decodedUserQuery) {
       localStorage.setItem("token", decodedTokenQuery);
-      loginState();
+      loginState(decodedTokenQuery);
       updateUserInfo(decodedUserQuery);
       setUsername(decodedUserQuery.username);
       router.replace("/");
     } else {
-      const userInfo = getUserInfo();
-      setUsername(userInfo.username || "user");
-      setLoading(false); // Mover aquí para asegurar que la carga solo se termina una vez obtenida la información
+      setInitialLoading(false);
     }
-  }, [params, loginState, updateUserInfo, getUserInfo, router]);
+  }, [params, loginState, updateUserInfo, router]);
 
-  if (loading) {
+  useEffect(() => {
+    if (!initialLoading && !userDataLoading && userData) {
+      setUsername(userData.username || "user");
+    }
+  }, [initialLoading, userDataLoading, userData]);
+
+  if (initialLoading || userDataLoading) {
     return <WelcomeLoad />;
   }
 
+  if (error) {
+    return <div>Error: {(error as UserError).message}</div>;
+  }
+
+  console.log(userData);
+
   return (
-    <main className="h-screen w-screen">
+    <main className="h-screen ">
       {isAuth() ? (
         <>
-          {" "}
           <NavigationBar />
-          Dashboard {username}
+          <div className="pt-16">
+            Dashboard {username}
+            <HomeTemplate userData={userData} fetchUserData={fetchUserData} />
+          </div>
         </>
       ) : (
-        <>
-          <WelcomeTemplate />
-        </>
+        <WelcomeTemplate />
       )}
     </main>
   );

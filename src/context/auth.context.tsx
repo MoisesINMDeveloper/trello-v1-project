@@ -5,6 +5,7 @@ import {
   ReactNode,
   Dispatch,
   SetStateAction,
+  useEffect,
 } from "react";
 
 interface UserInfoInterface {
@@ -25,6 +26,8 @@ interface AuthContextType {
   setUserInfo: Dispatch<SetStateAction<UserInfoInterface>>;
   passwordToConfirm: string;
   setPasswordToConfirm: Dispatch<SetStateAction<string>>;
+  loginState: (token: string) => void;
+  getToken: () => string | null;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(
@@ -47,6 +50,22 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     _id: "",
   });
 
+  const loginState = (token: string) => {
+    localStorage.setItem("token", token);
+    setIsAuthenticated(true);
+  };
+
+  const getToken = () => {
+    return localStorage.getItem("token");
+  };
+
+  useEffect(() => {
+    const token = getToken();
+    if (token) {
+      setIsAuthenticated(true);
+    }
+  }, []);
+
   return (
     <AuthContext.Provider
       value={{
@@ -58,6 +77,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         setUserInfo,
         passwordToConfirm,
         setPasswordToConfirm,
+        loginState,
+        getToken,
       }}
     >
       {children}
