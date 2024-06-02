@@ -151,7 +151,7 @@ const TaskContainer: React.FC<TaskContainerProps> = ({
     setTasks(reorderedTasks); // Actualizamos el estado con las tareas reordenadas
   };
   return (
-    <article className="flex flex-row justify-center items-center mt-12 gap-4">
+    <article className="flex flex-col justify-center items-center mt-12 gap-4">
       <DragDropContext onDragEnd={handleDragEnd}>
         <Droppable droppableId="droppable">
           {(provided) => (
@@ -170,9 +170,9 @@ const TaskContainer: React.FC<TaskContainerProps> = ({
                     >
                       <div
                         key={task.id}
-                        className="flex flex-col items-end justify-center  p-4 pb-8 mb-8 min-w-[280px] w-[280px] max-w-[500px] h-auto border-2 rounded-xl"
+                        className="flex flex-col justify-center  p-6 pb-8 mb-8  w-[auto] max-w-[350px] h-auto border-2 rounded-xl"
                       >
-                        <div className="mr-2 mt-[-2rem] mb-12">
+                        <div className="flex flex-col items-end mr-[-2.2rem] mt-[-2.2rem] mb-12">
                           <button
                             onClick={() => handleDeleteTask(task.id)}
                             className="absolute w-10 h-10 rounded-ful hover:text-red-500 "
@@ -180,7 +180,7 @@ const TaskContainer: React.FC<TaskContainerProps> = ({
                             <IoCloseOutline className=" border-1 rounded-full bg-white w-8 h-8" />
                           </button>
                         </div>
-                        <div className="flex flex-col items-center gap-4">
+                        <div className="flex flex-col items-center justify-center gap-4">
                           <div className=" flex flex-col items-center justify-center">
                             <div className="flex flex-col items-start justify-between">
                               <h1 className="text-lg mb-2 font-bold underline underline-offset-2 mt-[-2px]">
