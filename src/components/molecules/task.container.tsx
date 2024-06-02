@@ -181,7 +181,7 @@ const TaskContainer: React.FC<TaskContainerProps> = ({
                           </button>
                         </div>
                         <div className="flex flex-col justify-center items-stretch px-2 gap-4">
-                          <div className=" flex flex-col items-strench justify-center">
+                          <div className=" flex flex-col items-strench px-2 justify-center">
                             <h1 className="text-lg mb-2 text-start font-bold underline underline-offset-2 mt-[-2px]">
                               {task.title}
                             </h1>
@@ -197,13 +197,11 @@ const TaskContainer: React.FC<TaskContainerProps> = ({
                             <p className="text-xs">{task.description}</p>
                           </div>
                           <div>
-                            <p className="px-2 text-xs">
-                              <span className="font-bold underline underline-offset-2">
-                                Comentarios
-                              </span>
+                            <p className="px-2">
+                              <span className="font-bold">Comentarios</span>
                               {task.comments.map((comment) => (
                                 <div
-                                  className="mb-4 mt-2 border-1 px-3 pb-2 rounded-xl"
+                                  className="mb-4 mt-2 border-1 px-3 pb-4 rounded-xl"
                                   key={comment.id}
                                 >
                                   <div className="  mr-[-1.4rem]  mt-4 flex items-end justify-end">
