@@ -180,7 +180,7 @@ const TaskContainer: React.FC<TaskContainerProps> = ({
                             <IoCloseOutline className=" border-1 rounded-full bg-white w-8 h-8" />
                           </button>
                         </div>
-                        <div className="flex flex-col justify-center px-2 gap-4">
+                        <div className="flex flex-col justify-center items-stretch px-2 gap-4">
                           <div className=" flex flex-col items-center justify-center">
                             <h1 className="text-lg mb-2 text-start font-bold underline underline-offset-2 mt-[-2px]">
                               {task.title}
