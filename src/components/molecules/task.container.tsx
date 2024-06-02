@@ -170,29 +170,27 @@ const TaskContainer: React.FC<TaskContainerProps> = ({
                     >
                       <div
                         key={task.id}
-                        className="flex flex-col justify-center  p-6 pb-8 mb-8  w-[auto] max-w-[350px] h-auto border-2 rounded-xl"
+                        className="p-3 pb-8 mb-8  w-[90vw] md:max-w-[350px] h-auto border-2 rounded-xl"
                       >
-                        <div className="flex flex-col items-end mr-[-2.2rem] mt-[-2.2rem] mb-12">
+                        <div className="flex flex-col items-end justify-start ">
                           <button
                             onClick={() => handleDeleteTask(task.id)}
-                            className="absolute w-10 h-10 rounded-ful hover:text-red-500 "
+                            className=" w-10 h-10 rounded-full hover:text-red-500 "
                           >
                             <IoCloseOutline className=" border-1 rounded-full bg-white w-8 h-8" />
                           </button>
                         </div>
-                        <div className="flex flex-col items-center justify-center gap-4">
+                        <div className="flex flex-col justify-center px-2 gap-4">
                           <div className=" flex flex-col items-center justify-center">
-                            <div className="flex flex-col items-start justify-between">
-                              <h1 className="text-lg mb-2 font-bold underline underline-offset-2 mt-[-2px]">
-                                {task.title}
-                              </h1>
-                              <div className="flex flex-row items-center justify-between">
-                                <p className=" font-bold pr-12">Estado</p>
-                                <span className="flex flex-row gap-2 items-center">
-                                  {renderStatusIcon(task.status.id)}
-                                  {renderStatusOptions(task.id, task.status.id)}
-                                </span>
-                              </div>
+                            <h1 className="text-lg mb-2 text-start font-bold underline underline-offset-2 mt-[-2px]">
+                              {task.title}
+                            </h1>
+                            <div className="w-full flex flex-row items-center justify-between">
+                              <p className=" font-bold ">Estado</p>
+                              <span className=" flex flex-row gap-2 items-center justify-between">
+                                {renderStatusIcon(task.status.id)}
+                                {renderStatusOptions(task.id, task.status.id)}
+                              </span>
                             </div>
                           </div>
                           <div className=" border-1 p-3 rounded-xl">
