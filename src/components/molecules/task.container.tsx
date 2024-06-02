@@ -181,7 +181,7 @@ const TaskContainer: React.FC<TaskContainerProps> = ({
                           </button>
                         </div>
                         <div className="flex flex-col justify-center items-stretch px-2 gap-4">
-                          <div className=" flex flex-col items-center justify-center">
+                          <div className=" flex flex-col items-strench justify-center">
                             <h1 className="text-lg mb-2 text-start font-bold underline underline-offset-2 mt-[-2px]">
                               {task.title}
                             </h1>
