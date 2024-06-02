@@ -4,13 +4,24 @@ const LinksNavigation = ({
   href,
   text,
   className,
+  onClick,
 }: {
   href: string;
   text: string;
+  onClick?: () => void;
   className?: string;
 }) => {
+  const handleClick = () => {
+    if (onClick) {
+      onClick();
+    }
+  };
   return (
-    <Link className={` text-xs  ${className}`} href={href}>
+    <Link
+      className={` text-xs  ${className}`}
+      href={href}
+      onClick={handleClick}
+    >
       {text}
     </Link>
   );

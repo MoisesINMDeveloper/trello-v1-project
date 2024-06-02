@@ -14,3 +14,12 @@
   -webkit-backdrop-filter: blur(3.8px);
   backdrop-filter: blur(3.8px);
 }
+
+article > div:nth-child(1) {
+  display: flex;
+  align-items: start;
+  justify-content: center;
+  flex-wrap: wrap;
+  flex-direction: row;
+  gap: 2rem;
+}

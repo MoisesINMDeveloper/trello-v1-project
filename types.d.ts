@@ -16,7 +16,7 @@ export interface UserError {
 
 export interface Status {
   id: number;
-  name: string;
+  name?: string;
 }
 
 export interface Comment {

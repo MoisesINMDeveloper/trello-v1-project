@@ -1,25 +1,26 @@
+"use client";
 import React, { useState } from "react";
+
 import axios from "axios";
 import { Task } from "../../../types";
 import { IoCloseOutline } from "react-icons/io5";
-import {
-  AUTH_TASK,
-  COMMENT_TASK,
-  DELETE_COMMENT,
-  TASK_STATUS,
-} from "@/constant/apiKeys";
+import { AUTH_TASK, COMMENT_TASK, DELETE_COMMENT } from "@/constant/apiKeys";
 import { RiErrorWarningLine } from "react-icons/ri";
 import { TbProgressAlert } from "react-icons/tb";
 import { FaCheck } from "react-icons/fa6";
+import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 
 interface TaskContainerProps {
   tasks: Task[];
+
+  setTasks: (tasks: Task[]) => void;
+
   userId: number;
   fetchUserData: () => Promise<void>;
 }
-
 const TaskContainer: React.FC<TaskContainerProps> = ({
   tasks,
+  setTasks,
   userId,
   fetchUserData,
 }) => {
@@ -142,85 +143,124 @@ const TaskContainer: React.FC<TaskContainerProps> = ({
     );
   };
 
+  const handleDragEnd = (result: any) => {
+    if (!result.destination) return; // Si no hay destino, no hacemos nada
+    const reorderedTasks = Array.from(tasks);
+    const [removed] = reorderedTasks.splice(result.source.index, 1); // Removemos el elemento de la posición de origen
+    reorderedTasks.splice(result.destination.index, 0, removed); // Lo insertamos en la posición de destino
+    setTasks(reorderedTasks); // Actualizamos el estado con las tareas reordenadas
+  };
   return (
-    <section className="flex flex-col  justify-center items-center relative mt-12 gap-4">
-      {tasks.map((task) => (
-        <div
-          key={task.id}
-          className="p-4 pb-8 mb-8 w-[90vw] max-w-[85vw] h-auto border-2 rounded-xl flex flex-col gap-2"
-        >
-          <div className="mr-[-2rem] flex items-center justify-end">
-            <button
-              onClick={() => handleDeleteTask(task.id)}
-              className="relative w-10 h-10 flex items-center justify-center  mt-[-2.2rem]  text-gray-500 hover:text-red-500"
-            >
-              <IoCloseOutline className=" border-1 rounded-full bg-white w-8 h-8" />
-            </button>
-          </div>
-          <div className=" flex flex-col items-center justify-center">
-            <div className="flex flex-col items-center justify-between">
-              <h1 className="text-lg font-bold underline underline-offset-2 pl-2 mt-[-2px]">
-                {task.title}
-              </h1>
-              <div className="flex flex-row items-center justify-between">
-                <p className="font-bold pr-12">Estado</p>
-                <span className="flex flex-row gap-2 items-center">
-                  {renderStatusOptions(task.id, task.status.id)}
-                  {renderStatusIcon(task.status.id)}
-                </span>
-              </div>
-            </div>
-          </div>
-          <div className="border-1 p-2 rounded-xl">
-            <p className="text-xs">{task.description}</p>
-          </div>
-          <div className="flex flex-row py-2">
-            <p className="px-2 text-xs">
-              <span className="font-bold underline underline-offset-2 pb-2">
-                Comentarios
-              </span>
-              {task.comments.map((comment) => (
-                <div className="mt-2 border-1 p-4 rounded-xl" key={comment.id}>
-                  <div className=" mr-[-1.5rem] mt-[-.5rem] mb-2 flex items-center justify-end">
-                    <button
-                      onClick={() => handleDeleteComment(comment.id)}
-                      className="absolute border-1 rounded-full bg-white hover:text-red-500 items-center justify-center"
+    <article className="flex flex-row justify-center items-center mt-12 gap-4">
+      <DragDropContext onDragEnd={handleDragEnd}>
+        <Droppable droppableId="droppable">
+          {(provided) => (
+            <div {...provided.droppableProps} ref={provided.innerRef}>
+              {tasks.map((task, index) => (
+                <Draggable
+                  key={task.id}
+                  draggableId={task.id.toString()}
+                  index={index}
+                >
+                  {(provided) => (
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.draggableProps}
+                      {...provided.dragHandleProps}
                     >
-                      <IoCloseOutline className=" w-6 h-6" />
-                    </button>
-                  </div>
-                  <strong>{comment.username}</strong>: {comment.content}
-                </div>
+                      <div
+                        key={task.id}
+                        className="flex flex-col items-end justify-center  p-4 pb-8 mb-8 min-w-[280px] w-[280px] max-w-[500px] h-auto border-2 rounded-xl"
+                      >
+                        <div className="mr-2 mt-[-2rem] mb-12">
+                          <button
+                            onClick={() => handleDeleteTask(task.id)}
+                            className="absolute w-10 h-10 rounded-ful hover:text-red-500 "
+                          >
+                            <IoCloseOutline className=" border-1 rounded-full bg-white w-8 h-8" />
+                          </button>
+                        </div>
+                        <div className="flex flex-col items-center gap-4">
+                          <div className=" flex flex-col items-center justify-center">
+                            <div className="flex flex-col items-start justify-between">
+                              <h1 className="text-lg mb-2 font-bold underline underline-offset-2 mt-[-2px]">
+                                {task.title}
+                              </h1>
+                              <div className="flex flex-row items-center justify-between">
+                                <p className=" font-bold pr-12">Estado</p>
+                                <span className="flex flex-row gap-2 items-center">
+                                  {renderStatusIcon(task.status.id)}
+                                  {renderStatusOptions(task.id, task.status.id)}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className=" border-1 p-3 rounded-xl">
+                            <p className="text-xs">{task.description}</p>
+                          </div>
+                          <div>
+                            <p className="px-2 text-xs">
+                              <span className="font-bold underline underline-offset-2">
+                                Comentarios
+                              </span>
+                              {task.comments.map((comment) => (
+                                <div
+                                  className="mb-4 mt-2 border-1 px-3 pb-2 rounded-xl"
+                                  key={comment.id}
+                                >
+                                  <div className="  mr-[-1.4rem]  mt-4 flex items-end justify-end">
+                                    <button
+                                      onClick={() =>
+                                        handleDeleteComment(comment.id)
+                                      }
+                                      className="absolute border-1 rounded-full bg-white hover:text-red-500 items-center justify-center"
+                                    >
+                                      <IoCloseOutline className=" w-6 h-6" />
+                                    </button>
+                                  </div>
+                                  <strong>{comment.username}</strong>:{" "}
+                                  {comment.content}
+                                </div>
+                              ))}
+                            </p>
+                          </div>
+                          {taskIdWithOpenComment === task.id && (
+                            <form
+                              className="flex flex-row justify-between"
+                              onSubmit={(e) => {
+                                e.preventDefault();
+                                handleCommentSubmit(task.id);
+                              }}
+                            >
+                              <input
+                                className="p-2 h-8 outline-none"
+                                type="text"
+                                placeholder="Escribe un comentario..."
+                                value={newComment}
+                                onChange={handleCommentChange}
+                              />
+                              <button type="submit">Enviar</button>
+                            </form>
+                          )}
+                          {taskIdWithOpenComment !== task.id && (
+                            <button
+                              onClick={() => setTaskIdWithOpenComment(task.id)}
+                            >
+                              Agregar comentario
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </Draggable>
               ))}
-            </p>
-          </div>
-          {taskIdWithOpenComment === task.id && (
-            <form
-              className="flex flex-row justify-between"
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleCommentSubmit(task.id);
-              }}
-            >
-              <input
-                className="p-2 h-8 outline-none"
-                type="text"
-                placeholder="Escribe un comentario..."
-                value={newComment}
-                onChange={handleCommentChange}
-              />
-              <button type="submit">Enviar</button>
-            </form>
+              {provided.placeholder}
+            </div>
           )}
-          {taskIdWithOpenComment !== task.id && (
-            <button onClick={() => setTaskIdWithOpenComment(task.id)}>
-              Agregar comentario
-            </button>
-          )}
-        </div>
-      ))}
-    </section>
+        </Droppable>
+      </DragDropContext>
+    </article>
   );
 };
-
 export default TaskContainer;

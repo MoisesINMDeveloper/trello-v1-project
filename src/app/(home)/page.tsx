@@ -1,77 +1,70 @@
 "use client";
-import WelcomeTemplate from "@/templates/WelcomeTemplate/WelcomeTemplate";
-import { useAuth } from "@/hooks/use.auth";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
-import WelcomeLoad from "@/components/organism/WelcomeLoad/WelcomeLoad";
-import NavigationBar from "@/components/organism/NavigationBar/NavigationBar";
-import useUserData from "@/hooks/use.userdata";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import HomeTemplate from "@/templates/homeTemplate/home.template";
-import { UserError } from "../../../types";
+import NavigationBar from "@/components/organism/NavigationBar/NavigationBar";
+import { UserData } from "../../../types"; // Ajusta la ruta según sea necesario
+import { AUTH_GET_USER_DATA } from "@/constant/apiKeys";
+import WelcomeTemplate from "@/templates/WelcomeTemplate/WelcomeTemplate";
 
-export default function Home() {
-  const { isAuth, loginState, updateUserInfo } = useAuth();
-  const [initialLoading, setInitialLoading] = useState(true);
+const HomePage: React.FC = () => {
+  const [userData, setUserData] = useState<UserData | null>(null);
   const [username, setUsername] = useState<string>("");
-  const router = useRouter();
-  const params = useSearchParams();
-  const {
-    userData,
-    loading: userDataLoading,
-    error,
-    fetchUserData,
-  } = useUserData();
+  const [loading, setLoading] = useState<boolean>(true);
+
+  const fetchUserData = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(
+        `${process.env.API_URL}${AUTH_GET_USER_DATA}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      setUserData(response.data);
+      setUsername(response.data.username); // Asegúrate de que `username` exista en `UserData`
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const tokenQuery = params.get("token");
-    const decodedTokenQuery = tokenQuery
-      ? decodeURIComponent(tokenQuery)
-      : null;
-    const userQuery = params.get("username");
-    const decodedUserQuery = userQuery
-      ? JSON.parse(decodeURIComponent(userQuery))
-      : null;
+    fetchUserData();
+  }, []);
 
-    if (decodedTokenQuery && decodedUserQuery) {
-      localStorage.setItem("token", decodedTokenQuery);
-      loginState(decodedTokenQuery);
-      updateUserInfo(decodedUserQuery);
-      setUsername(decodedUserQuery.username);
-      router.replace("/");
-    } else {
-      setInitialLoading(false);
-    }
-  }, [params, loginState, updateUserInfo, router]);
-
-  useEffect(() => {
-    if (!initialLoading && !userDataLoading && userData) {
-      setUsername(userData.username || "user");
-    }
-  }, [initialLoading, userDataLoading, userData]);
-
-  if (initialLoading || userDataLoading) {
-    return <WelcomeLoad />;
+  if (loading) {
+    return (
+      <div className="w-screen h-screen flex items-center justify-center">
+        Loading...
+      </div>
+    );
   }
 
-  if (error) {
-    return <div>Error: {(error as UserError).message}</div>;
+  if (userData === null) {
+    return <WelcomeTemplate />;
   }
-
-  console.log(userData);
 
   return (
-    <main className="h-screen ">
-      {isAuth() ? (
-        <>
-          <NavigationBar />
-          <div className="pt-16">
-            Dashboard {username}
-            <HomeTemplate userData={userData} fetchUserData={fetchUserData} />
-          </div>
-        </>
-      ) : (
-        <WelcomeTemplate />
-      )}
-    </main>
+    <>
+      <NavigationBar />
+      <div className="pt-16">
+        <div className="flex flex-col items-center">
+          <h2 className="flex flex-row items-center justify-between text-[1.8rem] text-center mx-4">
+            Bienvenido
+            <span className="text-[2rem] mx-2 font-poetsen font-black italic">
+              ¡{username}!
+            </span>
+          </h2>
+          <p className="text-lg">¿Estas listo para tu primera tarea?</p>
+        </div>
+        <HomeTemplate userData={userData} fetchUserData={fetchUserData} />
+      </div>
+    </>
   );
-}
+};
+
+export default HomePage;
